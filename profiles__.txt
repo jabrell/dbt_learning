@@ -1,0 +1,14 @@
+my_dbt_learning: # This is the profile name
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres # This is the service name defined in docker-compose.yml
+      user: dbt_user
+      password: dbt_password
+      port: 5432
+      dbname: dbt_dev_db
+      schema: public # Or your desired default schema
+      threads: 4 # Adjust as needed
+      # keepalives_idle: 0 # Optional: to prevent idle_in_transaction_session_timeout
+      # connect_timeout: 10 # Optional

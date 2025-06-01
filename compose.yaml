@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:17.5 # You can specify a different version if needed
+    container_name: my_postgres_db
+    environment:
+      POSTGRES_USER: dbt_user
+      POSTGRES_PASSWORD: dbt_password
+      POSTGRES_DB: dbt_dev_db
+    ports:
+      - "5433:5432" # Exposes PostgreSQL on your host machine's port 5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data # Persists database data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbt_user -d dbt_dev_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.9.latest # Use a specific dbt version
+    # Or for the latest: image: ghcr.io/dbt-labs/dbt-postgres:latest
+    container_name: my_dbt_env
+    volumes:
+      - ./my_dbt_project:/usr/app/dbt_project # Mount your local dbt project
+      - ./profiles.yml:/root/.dbt/profiles.yml # Mount your dbt profiles file
+    working_dir: /usr/app/dbt_project
+    # Keep the container running so you can exec into it
+    # You can also override this with `docker-compose run dbt dbt run` for specific commands
+    command: tail -f /dev/null
+    depends_on:
+      postgres:
+        condition: service_healthy # Waits for postgres to be healthy
+    environment:
+      # These are examples if your profiles.yml uses environment variables
+      # Otherwise, configure connection details directly in profiles.yml
+      DBT_DB_HOST: postgres # This is the service name of your postgres container
+      DBT_DB_USER: dbt_user
+      DBT_DB_PASSWORD: dbt_password
+      DBT_DB_NAME: dbt_dev_db
+      DBT_DB_PORT: 5432
+
+volumes:
+  pg_data: # Defines the named volume for PostgreSQL data
