@@ -33,9 +33,13 @@ models:
   dbtlearn:
     # Config indicated by + and applies to all files under models/
     +materialized: view 
+    +post-hook:
+      - "GRANT SELECT ON {{ this }} TO ROLE REPORTER"
     dim:
       # Config indicated by + and applies to all files under models/dim/
       +materialized: table
     src:
       # Config indicated by + and applies to all files under models/src/
       +materialized: ephemeral
+
+
