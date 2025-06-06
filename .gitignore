@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+/dbtlearn/profiles.yml
+*/.tmp_*
 
 # C extensions
 *.so
